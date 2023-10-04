@@ -1,0 +1,124 @@
+version: '2'
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+  loki_data: {}
+
+services:
+    locust:
+        build:
+          dockerfile: Dockerfile.locust
+        ports:
+          - 6969:8089
+        command:
+          - /bin/bash
+          - -c
+          - locust -f /opt/locust_py/locust.py
+        depends_on:
+          - nginx
+        volumes:
+          - ./locust_py/:/opt/locust_py/
+    nginx:
+        image: nginx:latest
+        volumes:
+          - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on:
+          - web-service
+        ports:
+          - 8020
+    web-service:
+        image: web-service:tag
+        mem_limit: 3G
+        cpus: 2
+        ports:
+          - 8020
+        depends_on:
+          - redis
+          - postgres
+          - fluent-bit
+        logging:
+          driver: fluentd
+          options:
+            tag: nginx-service
+    redis:
+        image: redis:6.2-alpine
+        restart: always
+        ports:
+          - 6379
+        command: redis-server --save 20 1 --loglevel warning
+    postgres:
+        image: postgres:12.16
+        restart: always
+        environment:
+          POSTGRES_DB: "db_name"
+          POSTGRES_USER: "user_name"
+          POSTGRES_PASSWORD: "password"
+        ports:
+          - 5432
+        volumes:
+          - ./postgres_dump:/docker-entrypoint-initdb.d
+
+    prometheus:
+        image: prom/prometheus
+        restart: unless-stopped
+        volumes:
+          - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+          - prometheus_data:/prometheus
+        ports:
+          - 9090
+        depends_on:
+          - cadvisor
+    cadvisor:
+        image: gcr.io/cadvisor/cadvisor
+        volumes:
+          - /:/rootfs:ro
+          - /var/run:/var/run:ro
+          - /sys:/sys:ro
+          - /var/lib/docker/:/var/lib/docker:ro
+          - /dev/disk/:/dev/disk:ro
+        privileged: true
+        ports:
+          - 8080
+        restart: always
+        deploy:
+          mode: global
+    # id: 193
+    grafana:
+        image: grafana/grafana
+        user: '1001'
+        restart: unless-stopped
+        volumes:
+          - grafana_data:/var/lib/grafana
+          - ./grafana/provisioning:/etc/grafana/provisioning
+        ports:
+          - 3000:3000
+        depends_on:
+          - prometheus
+        environment:
+            GF_SECURITY_ADMIN_PASSWORD: admin
+            GF_USERS_ALLOW_SIGN_UP: 'false'
+    loki:
+        image: grafana/loki:2.4.0
+        volumes:
+          - ./loki:/etc/loki
+          - loki_data:/loki
+        ports:
+          - 3100
+        restart: unless-stopped
+        command: -config.file=/etc/loki/loki-config.yml
+
+    fluent-bit:
+        image: fluent/fluent-bit:2.1.6
+        command:
+          - /fluent-bit/bin/fluent-bit
+          - --config=/etc/fluent-bit/fluent-bit.conf
+        ports:
+          - "24224:24224"
+          - "24224:24224/udp"
+        volumes:
+          - ./fluent-bit-conf/:/etc/fluent-bit/:ro
+
+networks:
+  default:
+    driver: bridge
