@@ -328,7 +328,7 @@
       "targets": [
         {
           "datasource": "Prometheus",
-          "expr": "rate(container_cpu_user_seconds_total{image!=\"\"}[5m]) * 100",
+          "expr": "rate(container_cpu_user_seconds_total{name=~\"web-service-load-testing-web-service-.*\"}[5m]) * 100",
           "intervalFactor": 2,
           "legendFormat": "{{name}}",
           "metric": "cpu",
@@ -389,7 +389,7 @@
       "targets": [
         {
           "datasource": "Prometheus",
-          "expr": "container_memory_usage_bytes{image!=\"\"}",
+          "expr": "container_memory_usage_bytes{name=~\"web-service-load-testing-web-service.*\"}",
           "hide": false,
           "intervalFactor": 2,
           "legendFormat": "{{name}}",
@@ -641,8 +641,10 @@
     ]
   },
   "timezone": "browser",
-  "title": "Docker monitoring",
-  "uid": "a1c95e25-90ca-42f5-82fe-0dc58bcedb2d",
+  "title": "Web Service docker monitoring",
+  "uid": "a1c95e25-90ca-42f5-82fe-0dc58bcedb2e",
   "version": 6,
   "weekStart": ""
 }
+
+
