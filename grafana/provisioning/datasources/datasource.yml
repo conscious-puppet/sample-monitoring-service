@@ -17,3 +17,12 @@ datasources:
     url: http://loki:3100
     basicAuth: false
     editable: true
+
+  - name: Influxdb
+    type: influxdb
+    access: proxy
+    orgId: 1
+    url: http://influxdb:8086
+    database: k6
+    basicAuth: false
+    editable: true

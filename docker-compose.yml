@@ -19,6 +19,25 @@ services:
           - nginx
         volumes:
           - ./locust_py/:/opt/locust_py/
+    influxdb:
+        image: influxdb:1.8
+        ports:
+          - 8086
+        environment:
+          - INFLUXDB_DB=k6
+
+    # docker compose run --rm k6 run /scripts/script-name.js
+    k6:
+        image: grafana/k6:latest
+        ports:
+          - 6565
+        environment:
+          - K6_OUT=influxdb=http://influxdb:8086/k6
+        volumes:
+          - ./k6_scripts:/scripts
+          - ./k6_scripts/utils/:/scripts/utils/
+
+
     nginx:
         image: nginx:latest
         volumes:

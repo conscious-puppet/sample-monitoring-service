@@ -408,7 +408,7 @@
         {
           "datasource": "Loki",
           "editorMode": "code",
-          "expr": "quantile_over_time(0.95, {job = \"turing-hs\"} | json | line_format \"{{.log}}\" | json | value_metricName = \"METRIC_NAME\" | unwrap value_metricValue [$__interval]) by (apiName)",
+          "expr": "quantile_over_time(0.95, {job = \"web-service\"} | json | line_format \"{{.log}}\" | json | value_metricName = \"METRIC_NAME\" | unwrap value_metricValue [$__interval]) by (apiName)",
           "queryType": "range",
           "refId": "A"
         }
@@ -493,7 +493,7 @@
         {
           "datasource": "Loki",
           "editorMode": "code",
-          "expr": "quantile_over_time(0.50, {job = \"turing-hs\"} | json | line_format \"{{.log}}\" | json | value_metricName = \"METRIC_NAME\" | unwrap value_metricValue [$__interval]) by (apiName)",
+          "expr": "quantile_over_time(0.50, {job = \"web-service\"} | json | line_format \"{{.log}}\" | json | value_metricName = \"METRIC_NAME\" | unwrap value_metricValue [$__interval]) by (apiName)",
           "queryType": "range",
           "refId": "A"
         }
@@ -762,7 +762,7 @@
         {
           "datasource": "Prometheus",
           "editorMode": "code",
-          "expr": "rate(container_cpu_user_seconds_total{name=~\"turing-benchmark-turing-hs-service-.*\"}[5m]) * 100",
+          "expr": "rate(container_cpu_user_seconds_total{name=~\"web-benchmark-web-service-service-.*\"}[5m]) * 100",
           "intervalFactor": 2,
           "legendFormat": "{{name}}",
           "metric": "cpu",
@@ -771,7 +771,7 @@
           "step": 10
         }
       ],
-      "title": "Turing HS Service CPU Usage",
+      "title": "web Service CPU Usage",
       "type": "timeseries"
     },
     {
@@ -948,7 +948,7 @@
         {
           "datasource": "Prometheus",
           "editorMode": "code",
-          "expr": "container_memory_usage_bytes{name=~\"turing-benchmark-turing-hs-service-.*\"}",
+          "expr": "container_memory_usage_bytes{name=~\"web-benchmark-web-service-service-.*\"}",
           "hide": false,
           "intervalFactor": 2,
           "legendFormat": "{{name}}",
@@ -958,7 +958,7 @@
           "step": 10
         }
       ],
-      "title": "Turing HS Service Memory Usage",
+      "title": "web Service Memory Usage",
       "type": "timeseries"
     },
     {
