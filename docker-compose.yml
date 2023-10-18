@@ -36,7 +36,8 @@ services:
         volumes:
           - ./k6_scripts:/scripts
           - ./k6_scripts/utils/:/scripts/utils/
-
+        command:
+          - "run /scripts/script-name.js"
 
     nginx:
         image: nginx:latest
